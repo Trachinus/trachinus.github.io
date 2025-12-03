@@ -1064,3 +1064,17 @@ body.native-cursor .code-modal-close {
         transform: translateY(0);
     }
 }
+/* TOC Toggle Animation */
+.toc-toggle {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.toc-toggle:hover {
+    transform: scale(1.1);
+    color: var(--primary);
+    cursor: none;
+}
+
+body.native-cursor .toc-toggle:hover {
+    cursor: pointer;
+}

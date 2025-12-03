@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Magnetic Background Box Effect ---
     // Exclude .dock-item from magnetic effects
-    const magneticLinks = document.querySelectorAll('a:not(.dock-item), .magnetic-btn');
+    const magneticLinks = document.querySelectorAll('a:not(.dock-item):not(.post-card), .magnetic-btn');
 
     magneticLinks.forEach(link => {
         // Inject hover box
