@@ -1,0 +1,1066 @@
+:root {
+    --bg: #0a0a0a;
+    --fg: #ededed;
+    --primary: #3b82f6;
+    --secondary: #a855f7;
+    --border: #262626;
+    --surface: #171717;
+    --muted: #a3a3a3;
+
+    --font-sans: 'Inter', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+
+    /* Default (Dark) Heading Colors */
+    --h2-color: #93c5fd;
+    --h3-color: #d8b4fe;
+}
+
+.light-theme {
+    --bg: #fafafa;
+    --fg: #171717;
+    --primary: #2563eb;
+    --secondary: #9333ea;
+    --border: #e5e5e5;
+    --surface: #ffffff;
+    --muted: #52525b;
+
+    /* Light Theme Heading Colors (Darker for contrast) */
+    --h2-color: #2563eb;
+    --h3-color: #9333ea;
+
+    /* Light Theme Code Colors */
+    --code-bg: #e5e7eb;
+    --code-fg: #c026d3;
+    /* Purple-600 */
+}
+
+/* Native Cursor Mode */
+body.native-cursor {
+    cursor: auto;
+}
+
+body.native-cursor a,
+body.native-cursor button,
+body.native-cursor .icon-btn {
+    cursor: pointer;
+}
+
+body.native-cursor .cursor,
+body.native-cursor .cursor-follower {
+    display: none !important;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    cursor: none;
+    /* Hide default cursor */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+a,
+button,
+.icon-btn {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: none;
+    /* Force custom cursor */
+    position: relative;
+    /* For absolute positioning of hover-box */
+    z-index: 1;
+    /* Ensure text is above hover-box */
+    display: inline-block;
+}
+
+/* Custom Cursor */
+.cursor {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 2147483647;
+    /* Max safe integer to stay on top of everything */
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, opacity 0.3s ease, background-color 0.3s;
+    opacity: 0;
+}
+
+.cursor-follower {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 2147483646;
+    /* Just below cursor */
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease, background-color 0.3s, opacity 0.3s ease, border-color 0.3s;
+    opacity: 0;
+}
+
+/* ... (keep other styles) ... */
+
+.markdown-body code {
+    background-color: rgba(139, 233, 253, 0.1);
+    color: #8be9fd;
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.light-theme .markdown-body code {
+    background-color: var(--code-bg);
+    color: var(--code-fg);
+}
+
+/* Fix: Ensure code inside pre (blocks) does NOT get the inline code background */
+.markdown-body pre code,
+.light-theme .markdown-body pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* ... */
+
+/* Floating TOC */
+.toc-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    /* Ensure it's above other content */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.toc-toggle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    /* Force custom cursor */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    /* Ensure it can be clicked */
+    pointer-events: auto;
+    z-index: 2;
+}
+
+/* Native cursor override */
+body.native-cursor .toc-toggle {
+    cursor: pointer;
+}
+
+.toc-dropdown {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 300px;
+    /* Increased width */
+    background-color: rgba(23, 23, 23, 0.95);
+    /* Slightly more opaque */
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    /* Increased padding */
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    pointer-events: none;
+    /* Hidden by default */
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 1;
+}
+
+.light-theme .toc-dropdown {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.toc-container.active .toc-dropdown {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    /* Visible */
+}
+
+.toc-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 1.1rem;
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list li {
+    margin-bottom: 0.5rem;
+}
+
+.toc-link {
+    display: block;
+    padding: 0.5rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    transition: color 0.2s;
+    position: relative;
+    z-index: 1;
+    /* Ensure text is above hover box */
+    border-radius: 6px;
+}
+
+.toc-link:hover {
+    color: var(--primary);
+}
+
+.toc-link.h3 {
+    padding-left: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* TOC Hover Box (Magnetic Effect) */
+.toc-hover-box {
+    position: absolute;
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    z-index: 0;
+    /* Above background, below text */
+    opacity: 0;
+    transition: opacity 0.2s, border-color 0.3s, width 0.1s, height 0.1s, top 0.1s, left 0.1s;
+    pointer-events: none;
+    /* Critical: prevents interference with mouse events */
+}
+
+/* Code Modal */
+.code-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 20000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.code-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.code-modal-content {
+    background-color: #282a36;
+    /* Always Dracula background */
+    width: 90%;
+    max-width: 1200px;
+    height: 85vh;
+    border-radius: 12px;
+    border: 1px solid #44475a;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.code-modal-overlay.active .code-modal-content {
+    transform: scale(1);
+}
+
+.code-modal-body {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
+    font-family: var(--font-mono);
+    color: #f8f8f2 !important;
+    /* Force Dracula foreground */
+}
+
+/* Force cursor behavior in modal */
+.code-modal-body,
+.code-modal-body pre,
+.code-modal-body code {
+    cursor: text !important;
+}
+
+/* Fix: Remove incorrect override that broke syntax highlighting */
+.code-modal-body .codehilite {
+    background: transparent !important;
+}
+
+/* Only reset background for spans, DO NOT inherit color */
+.code-modal-body .codehilite span {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Hide custom cursor when modal is active and hovered (handled by JS class) */
+body.modal-hover .cursor,
+body.modal-hover .cursor-follower {
+    opacity: 0 !important;
+}
+
+
+.cursor-follower.active {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+}
+
+a:hover,
+button:hover,
+.icon-btn:hover {
+    color: var(--primary);
+}
+
+.hover-box {
+    position: absolute;
+    top: -6px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 12px);
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.2s, border-color 0.3s;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    width: 100%;
+}
+
+/* Header */
+.header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+    margin-bottom: 3rem;
+    backdrop-filter: blur(10px);
+    background-color: rgba(10, 10, 10, 0.8);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.light-theme .header {
+    background-color: rgba(250, 250, 250, 0.8);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.25rem;
+    background: #54789c;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Toggle Buttons */
+.nav-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: color 0.2s, background-color 0.2s, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    color: var(--fg);
+    background-color: var(--surface);
+    transform: scale(1.1) rotate(5deg);
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Hero */
+.hero {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.centered-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    /* Center vertically on screen */
+    text-align: center;
+}
+
+.hero-content-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 3px solid var(--primary);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+    overflow: hidden;
+}
+
+.profile-container:hover {
+    /* transform: scale(1.05); Removed as per user request */
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.6);
+    /* Enhanced glow on hover */
+    border-color: var(--primary);
+    /* Optional: brighten border slightly */
+}
+
+.profile-pic-large,
+.profile-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.profile-video {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+    /* Optimize rendering quality */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    filter: blur(0.2px);
+}
+
+.hero-text-centered {
+    max-width: 700px;
+}
+
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.light-theme .hero-title {
+    background: linear-gradient(to right, #171717, #52525b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Post List */
+.post-list {
+    list-style: none;
+}
+
+.post-item {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.post-meta {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+}
+
+/* Posts Grid */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.view-all {
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.posts-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.post-card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Dock-style Contact Widget */
+.dock-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+}
+
+.dock {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background-color: rgba(23, 23, 23, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.light-theme .dock {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dock-item {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface);
+    border-radius: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+
+.dock-icon {
+    width: 24px;
+    height: 24px;
+    z-index: 2;
+    color: var(--fg);
+    transition: color 0.3s;
+}
+
+.dock-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Hover Effects */
+.dock-item:hover {
+    transform: translateY(-10px) scale(1.1);
+    background-color: var(--item-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dock-item:hover .dock-icon {
+    color: white;
+}
+
+/* Optional: Add a subtle reflection or shine */
+.dock-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.dock-item:hover::after {
+    opacity: 1;
+}
+
+/* Post Detail */
+.post-header {
+    margin-bottom: 3rem;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.post-title-large {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+.post-meta-large {
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Markdown Body */
+.markdown-body {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    /* Slightly increased for serif */
+    line-height: 1.8;
+    color: var(--fg);
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    font-family: var(--font-heading);
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.markdown-body h1 {
+    font-size: 2.5rem;
+    color: var(--fg);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    /* Less top margin for the first title */
+}
+
+.markdown-body h2 {
+    font-size: 1.8rem;
+    color: var(--h2-color);
+    /* Pastel Blue (Blue 300) */
+    border-bottom: 1px solid var(--border);
+    border-bottom-color: color-mix(in srgb, var(--h2-color), transparent 70%);
+    /* Very subtle pastel blue border */
+    padding-bottom: 0.3rem;
+}
+
+.markdown-body h3 {
+    font-size: 1.4rem;
+    color: var(--h3-color);
+    /* Pastel Purple (Purple 300) */
+}
+
+.markdown-body h4 {
+    font-size: 1.2rem;
+    color: var(--fg);
+    opacity: 0.9;
+    /* Slightly brighter than muted */
+}
+
+.markdown-body h5 {
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.markdown-body h6 {
+    font-size: 1rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.markdown-body p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.markdown-body li {
+    margin-bottom: 0.5rem;
+}
+
+.markdown-body pre {
+    background-color: #282a36;
+    /* Dracula Background */
+    padding: 1.5rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border: 1px solid #44475a;
+    /* Dracula Selection/Comment */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    /* For copy button positioning */
+    cursor: text;
+    /* Restore text cursor */
+}
+
+.markdown-body pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.95em;
+    color: #f8f8f2;
+    border: none;
+    /* Fix: Remove inherited border */
+    border-radius: 0;
+}
+
+.markdown-body code {
+    background-color: rgba(139, 233, 253, 0.1);
+    /* Dracula Cyan low opacity */
+    color: #8be9fd;
+    /* Dracula Cyan */
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    /* Removed border for cleaner look */
+}
+
+.light-theme .markdown-body code {
+    background-color: var(--code-bg);
+    color: var(--code-fg);
+}
+
+/* Force transparent background for syntax highlighting tokens to avoid "boxes" */
+.codehilite span {
+    background-color: transparent !important;
+    border: none !important;
+    /* Force remove any borders */
+    outline: none !important;
+}
+
+/* Nuclear option for code block artifacts */
+.markdown-body pre * {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Copy Button */
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f8f8f2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    font-family: var(--font-sans);
+}
+
+.markdown-body pre:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.copy-btn.copied {
+    background-color: #50fa7b;
+    /* Dracula Green */
+    color: #282a36;
+    border-color: #50fa7b;
+}
+
+/* Expand Button */
+.expand-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 3.5rem;
+    /* Left of Copy button */
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f8f8f2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.markdown-body pre:hover .expand-btn {
+    opacity: 1;
+}
+
+.expand-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.expand-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Code Modal */
+.code-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 20000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.code-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.code-modal-content {
+    background-color: #282a36;
+    width: 90%;
+    max-width: 1200px;
+    height: 85vh;
+    border-radius: 12px;
+    border: 1px solid #44475a;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.code-modal-overlay.active .code-modal-content {
+    transform: scale(1);
+}
+
+.code-modal-header {
+    padding: 1rem;
+    border-bottom: 1px solid #44475a;
+    display: flex;
+    justify-content: flex-end;
+    background-color: #21222c;
+}
+
+.code-modal-close {
+    background: none;
+    border: none;
+    color: #f8f8f2;
+    cursor: none;
+    /* Force custom cursor */
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    display: flex;
+    /* Ensure SVG centers */
+    align-items: center;
+    justify-content: center;
+}
+
+.code-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Native cursor override */
+body.native-cursor .code-modal-close {
+    cursor: pointer;
+}
+
+.code-modal-body {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
+}
+
+.code-modal-body pre {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.code-modal-body code {
+    font-size: 1rem;
+    /* Larger font for modal */
+    white-space: pre;
+}
+
+.markdown-body blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-bottom: 1.5rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* Footer */
+.footer {
+    margin-top: auto;
+    padding: 3rem 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

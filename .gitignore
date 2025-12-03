@@ -6,7 +6,8 @@ __pycache__/
 # Source files
 build.py
 content/
-static/
+/static/
+/templates/
 
 # System
 .DS_Store
