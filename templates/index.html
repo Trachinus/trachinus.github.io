@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero centered-hero">
+    <div class="hero-content-centered">
+        <div class="profile-container">
+            <img src="static/profile.png" alt="Profile Picture" class="profile-pic-large">
+            <video class="profile-video" muted playsinline loop autoplay>
+                <source src="static/pp_tail_loop.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="hero-text-centered">
+            <h1 class="hero-title">Hey welcome on my blog, I'm <span class="username-glow">Trachinus</span></h1>
+            <p class="hero-subtitle">
+                Cybesec enthusiast & CTF enjoyer.<br>
+                I share my writeups and findings here.
+            </p>
+        </div>
+    </div>
+
+    <!-- Dock-style Contact Widget -->
+    <div class="dock-container">
+        <div class="dock">
+            {% for contact in contacts %}
+            <a href="{{ contact.url }}" target="_blank" class="dock-item" style="--item-color: {{ contact.color }}"
+                title="{{ contact.name }}">
+                <span class="dock-icon">{{ contact.icon }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+</div>
+{% endblock %}
