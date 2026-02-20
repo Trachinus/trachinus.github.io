@@ -123,6 +123,7 @@ button,
     border-radius: 6px;
     font-family: var(--font-mono);
     font-size: 0.9em;
+    word-break: break-word;
 }
 
 .light-theme .markdown-body code {
@@ -736,6 +737,46 @@ button:hover,
     gap: 1rem;
 }
 
+/* Language Switcher */
+.post-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.post-header-top .back-link {
+    margin-bottom: 0;
+}
+
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-family: var(--font-heading);
+    font-weight: 500;
+}
+
+.lang-code {
+    color: var(--muted);
+    transition: color 0.2s;
+    text-transform: uppercase;
+}
+
+.lang-code:hover {
+    color: var(--primary);
+}
+
+.lang-code.active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.lang-separator {
+    color: var(--border);
+}
+
 /* Markdown Body */
 .markdown-body {
     font-family: var(--font-serif);
@@ -743,6 +784,10 @@ button:hover,
     /* Slightly increased for serif */
     line-height: 1.8;
     color: var(--fg);
+}
+
+.markdown-body a {
+    color: var(--primary);
 }
 
 .markdown-body h1,
@@ -1064,6 +1109,7 @@ body.native-cursor .code-modal-close {
         transform: translateY(0);
     }
 }
+
 /* TOC Toggle Animation */
 .toc-toggle {
     transition: transform 0.2s ease, color 0.2s ease;
