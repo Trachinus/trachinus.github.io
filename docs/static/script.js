@@ -26,105 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Custom Cursor Logic ---
-    const cursor = document.createElement('div');
-    cursor.classList.add('cursor');
-    document.body.appendChild(cursor);
-
-    const follower = document.createElement('div');
-    follower.classList.add('cursor-follower');
-    document.body.appendChild(follower);
-
-    let mouseX = 0;
-    let mouseY = 0;
-    let followerX = 0;
-    let followerY = 0;
-    let hasMoved = false;
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        if (!hasMoved) {
-            hasMoved = true;
-            cursor.style.opacity = '1';
-            follower.style.opacity = '1';
-            followerX = mouseX;
-            followerY = mouseY;
-        }
-
-        cursor.style.left = mouseX + 'px';
-        cursor.style.top = mouseY + 'px';
-    });
-
-    function animate() {
-        const speed = 0.15;
-        followerX += (mouseX - followerX) * speed;
-        followerY += (mouseY - followerY) * speed;
-
-        follower.style.left = followerX + 'px';
-        follower.style.top = followerY + 'px';
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // --- Magnetic Background Box Effect ---
-    // Exclude .dock-item from magnetic effects
-    const magneticLinks = document.querySelectorAll('a:not(.dock-item):not(.post-card), .magnetic-btn');
-
-    magneticLinks.forEach(link => {
-        // Inject hover box
-        const box = document.createElement('span');
-        box.classList.add('hover-box');
-        link.appendChild(box);
-
-        link.addEventListener('mouseenter', () => {
-            // Hide follower but keep cursor (dot)
-            cursor.style.opacity = '1';
-            follower.style.opacity = '0';
-        });
-
-        link.addEventListener('mousemove', (e) => {
-            const rect = link.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-
-            // Magnetic pull strength for the box
-            const strength = 0.3;
-            box.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
-            box.style.opacity = '1';
-        });
-
-        link.addEventListener('mouseleave', () => {
-            box.style.transform = 'translate(0, 0)';
-            box.style.opacity = '0';
-
-            // Show follower again
-            cursor.style.opacity = '1';
-            follower.style.opacity = '1';
-        });
-    });
-
-    // --- Code Block Cursor Logic ---
-    const codeBlocks = document.querySelectorAll('pre, code');
-    codeBlocks.forEach(block => {
-        block.addEventListener('mouseenter', () => {
-            cursor.style.opacity = '0';
-            follower.style.opacity = '0';
-        });
-        block.addEventListener('mouseleave', () => {
-            cursor.style.opacity = '1';
-            follower.style.opacity = '1';
-        });
-    });
-
     // --- Copy Code Button & Expand Button ---
     document.querySelectorAll('pre').forEach(pre => {
-        // Handle cursor visibility for non-expanded blocks
-        pre.addEventListener('mouseenter', () => document.body.classList.add('modal-hover')); // Reuse modal-hover class which hides cursor
-        pre.addEventListener('mouseleave', () => document.body.classList.remove('modal-hover'));
-
         // Wrapper for buttons
         const buttonWrapper = document.createElement('div');
         buttonWrapper.style.position = 'absolute';
@@ -226,10 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const modalBody = document.createElement('div');
             modalBody.className = 'code-modal-body markdown-body';
 
-            // Handle cursor visibility
-            modalBody.addEventListener('mouseenter', () => document.body.classList.add('modal-hover'));
-            modalBody.addEventListener('mouseleave', () => document.body.classList.remove('modal-hover'));
-
             // Wrap in codehilite to ensure syntax highlighting styles apply
             const codeHilite = document.createElement('div');
             codeHilite.className = 'codehilite';
@@ -274,50 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-    });
-
-    // --- Theme Toggle ---
-    const themeToggle = document.getElementById('theme-toggle');
-    const sunIcon = themeToggle.querySelector('.sun-icon');
-    const moonIcon = themeToggle.querySelector('.moon-icon');
-
-    // Check saved preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-    } else {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-    }
-
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-
-        if (isLight) {
-            sunIcon.style.display = 'none';
-            moonIcon.style.display = 'block';
-        } else {
-            sunIcon.style.display = 'block';
-            moonIcon.style.display = 'none';
-        }
-    });
-
-    // --- Cursor Toggle ---
-    const cursorToggle = document.getElementById('cursor-toggle');
-    const savedCursor = localStorage.getItem('nativeCursor');
-
-    if (savedCursor === 'true') {
-        document.body.classList.add('native-cursor');
-    }
-
-    cursorToggle.addEventListener('click', () => {
-        document.body.classList.toggle('native-cursor');
-        const isNative = document.body.classList.contains('native-cursor');
-        localStorage.setItem('nativeCursor', isNative);
     });
 
     // --- Floating TOC ---
@@ -379,10 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     tocContainer.classList.remove('active');
                 });
 
-                // Add magnetic effect logic
                 a.addEventListener('mouseenter', (e) => {
-                    // Calculate position relative to the dropdown container
-                    // This ensures the box moves with scroll and is clipped correctly
                     const linkRect = a.getBoundingClientRect();
                     const containerRect = tocDropdown.getBoundingClientRect();
 
@@ -394,18 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     tocHoverBox.style.top = `${relativeTop - 6}px`;
                     tocHoverBox.style.left = `${relativeLeft - 10}px`;
                     tocHoverBox.style.opacity = '1';
-
-                    // Hide main cursor follower
-                    const follower = document.querySelector('.cursor-follower');
-                    const cursor = document.querySelector('.cursor');
-                    if (follower) follower.style.opacity = '0';
-                    if (cursor) cursor.style.opacity = '1';
                 });
 
                 a.addEventListener('mouseleave', () => {
                     tocHoverBox.style.opacity = '0';
-                    const follower = document.querySelector('.cursor-follower');
-                    if (follower) follower.style.opacity = '1';
                 });
 
                 li.appendChild(a);
