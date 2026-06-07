@@ -2,26 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://trachinus.me/</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
   <url>
     <loc>https://trachinus.me/writeups.html</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
   <url>
     <loc>https://trachinus.me/cves.html</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
   <url>
     <loc>https://trachinus.me/cves/CVE-2026-27472.html</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
   <url>
     <loc>https://trachinus.me/cves/CVE-2026-27475.html</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
   <url>
     <loc>https://trachinus.me/heroctfv7/middle_earth.html</loc>
-    <lastmod>2026-06-07T17:02:38+00:00</lastmod>
+    <lastmod>2026-06-07T17:07:09+00:00</lastmod>
   </url>
 </urlset>
