@@ -1068,7 +1068,7 @@ body.design-pimp .header {
 }
 
 body.design-pimp .logo {
-    background: linear-gradient(90deg, #8ef3e4 0%, #35c8e8 48%, #4d9cff 100%);
+    background: linear-gradient(90deg, #35c8e8 0%, #4d9cff 45%, #e8c66f 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1303,7 +1303,7 @@ body.design-pimp .markdown-body a:hover {
 
 body.design-pimp .markdown-body strong,
 body.design-pimp .markdown-body b {
-    background: linear-gradient(90deg, #8ef3e4 0%, #35c8e8 45%, #e8c66f 100%);
+    background: linear-gradient(90deg, #ff9f8a 0%, #ffc36b 50%, #ffe39a 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1446,8 +1446,172 @@ body.design-pimp .markdown-body img {
 }
 
 body.design-pimp .toc-toggle {
-    background: var(--surface);
-    border-color: var(--border);
+    background:
+        radial-gradient(circle at 30% 18%, rgba(255, 159, 138, 0.16), transparent 1.1rem),
+        linear-gradient(135deg, rgba(45, 212, 200, 0.2), rgba(6, 15, 25, 0.94));
+    border-color: rgba(122, 235, 255, 0.38);
+    color: #bff9f1;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 12px 30px rgba(0, 0, 0, 0.26),
+        0 0 18px rgba(53, 200, 232, 0.16);
+}
+
+body.design-pimp .toc-toggle:hover {
+    color: #ffe1a6;
+    border-color: rgba(255, 195, 107, 0.55);
+    transform: translateY(-2px);
+}
+
+body.design-pimp .toc-dropdown {
+    background:
+        linear-gradient(135deg, rgba(45, 212, 200, 0.11), rgba(57, 168, 255, 0.07), rgba(255, 159, 138, 0.055)),
+        rgba(5, 12, 21, 0.96);
+    border: 1px solid rgba(122, 235, 255, 0.26);
+    border-radius: 10px;
+    box-shadow:
+        0 20px 52px rgba(0, 0, 0, 0.32),
+        0 0 0 1px rgba(255, 255, 255, 0.035) inset,
+        0 0 28px rgba(53, 200, 232, 0.1);
+    backdrop-filter: blur(14px);
+}
+
+body.design-pimp .toc-title {
+    color: #f5fbff;
+    border-bottom-color: rgba(122, 235, 255, 0.2);
+}
+
+body.design-pimp .toc-title::after {
+    content: '';
+    display: block;
+    width: 3.4rem;
+    height: 2px;
+    margin-top: 0.55rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #8ef3e4, #35c8e8 58%, #ff9f8a);
+}
+
+body.design-pimp .toc-link {
+    color: rgba(221, 240, 246, 0.72);
+    border-radius: 7px;
+}
+
+body.design-pimp .toc-link:hover {
+    color: #fff1ca;
+}
+
+body.design-pimp .toc-link.h3 {
+    color: rgba(184, 218, 228, 0.72);
+}
+
+body.design-pimp .toc-link.h3:hover {
+    color: #ffd6a7;
+}
+
+body.design-pimp .toc-hover-box {
+    background:
+        linear-gradient(90deg, rgba(45, 212, 200, 0.13), rgba(255, 159, 138, 0.09));
+    border-color: rgba(255, 195, 107, 0.32);
+    box-shadow: 0 0 16px rgba(53, 200, 232, 0.12);
+}
+
+.fishing-line {
+    position: fixed;
+    top: 0;
+    right: clamp(1rem, 4vw, 3rem);
+    width: 2.4rem;
+    height: 13.45rem;
+    transform-origin: 50% 0;
+    animation: hookSway 4.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 9;
+    will-change: transform, opacity;
+}
+
+.fishing-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 11.8rem;
+    background: linear-gradient(180deg, rgba(142, 243, 228, 0.8), rgba(142, 243, 228, 0.12));
+    box-shadow: 0 0 10px rgba(53, 200, 232, 0.2);
+    transform: translateX(-50%);
+}
+
+.fish-hook {
+    position: absolute;
+    opacity: 0.65;
+    left: calc(50% - 0.71rem);
+    bottom: -0.08rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 999px;
+    background: url('/static/hamecon.png') center / contain no-repeat;
+    color: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+    transform: rotate(-10deg);
+    filter: invert(90%) sepia(20%) saturate(650%) hue-rotate(135deg) brightness(108%) drop-shadow(0 0 9px rgba(53, 200, 232, 0.28));
+}
+
+.fishing-line.reeling {
+    animation: reelHook 2.05s both;
+}
+
+@keyframes hookSway {
+    0%,
+    100% {
+        transform: rotate(-2.5deg);
+    }
+
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+@keyframes reelHook {
+    0% {
+        transform: translateY(0) rotate(-2deg);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.18, 0.86, 0.24, 1);
+    }
+
+    30% {
+        transform: translateY(-13.4rem) rotate(6deg);
+        opacity: 1;
+        animation-timing-function: ease-out;
+    }
+
+    38% {
+        transform: translateY(-14.4rem) rotate(4deg);
+        opacity: 0;
+        animation-timing-function: linear;
+    }
+
+    46% {
+        transform: translateY(-14.4rem) rotate(0deg);
+        opacity: 0;
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    47% {
+        transform: translateY(-14.2rem) rotate(-2deg);
+        opacity: 1;
+    }
+
+    88% {
+        transform: translateY(0) rotate(-2deg);
+        opacity: 1;
+        animation-timing-function: ease-in-out;
+    }
+
+    100% {
+        transform: translateY(0) rotate(-2deg);
+        opacity: 1;
+    }
 }
 
 .not-found {
@@ -1475,6 +1639,10 @@ body.design-pimp .toc-toggle {
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
+    }
+
+    .fishing-line {
+        animation: none;
     }
 }
 
@@ -1530,5 +1698,16 @@ body.design-pimp .toc-toggle {
     .toc-container {
         bottom: 1rem;
         right: 1rem;
+    }
+
+    .fishing-line {
+        top: 7.9rem;
+        right: 1.1rem;
+        height: 7.2rem;
+        opacity: 0.8;
+    }
+
+    .fishing-line::before {
+        height: 5.8rem;
     }
 }

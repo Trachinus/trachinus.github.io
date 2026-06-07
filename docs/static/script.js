@@ -26,6 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Fishing Hook ---
+    const fishingLine = document.querySelector('.fishing-line');
+    const fishHook = document.querySelector('.fish-hook');
+
+    if (fishingLine && fishHook) {
+        fishHook.addEventListener('click', () => {
+            if (fishingLine.classList.contains('reeling')) return;
+
+            fishingLine.classList.add('reeling');
+            setTimeout(() => {
+                fishingLine.classList.remove('reeling');
+            }, 2050);
+        });
+    }
+
     // --- Copy Code Button & Expand Button ---
     document.querySelectorAll('pre').forEach(pre => {
         // Wrapper for buttons
@@ -202,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Dropdown
             const tocDropdown = document.createElement('div');
             tocDropdown.className = 'toc-dropdown';
-            tocDropdown.innerHTML = '<div class="toc-title">Table of Contents</div>';
+            tocDropdown.innerHTML = '<div class="toc-title">Fishing spots</div>';
 
             // Create TOC hover box INSIDE dropdown for correct scrolling/clipping
             const tocHoverBox = document.createElement('div');
