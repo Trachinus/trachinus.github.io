@@ -1099,10 +1099,10 @@ body.design-pimp .post::before {
     pointer-events: none;
     z-index: -1;
     background:
-        radial-gradient(circle at 28% 18%, rgba(45, 212, 200, 0.22), transparent 24rem),
-        radial-gradient(circle at 76% 22%, rgba(255, 214, 102, 0.12), transparent 22rem),
-        radial-gradient(circle at 50% 54%, rgba(57, 168, 255, 0.18), transparent 32rem),
-        linear-gradient(180deg, rgba(4, 16, 24, 0), rgba(2, 8, 14, 0.2));
+        radial-gradient(circle at 16% 12%, rgba(45, 212, 200, 0.19), transparent 24rem),
+        radial-gradient(circle at 86% 8%, rgba(255, 214, 102, 0.13), transparent 23rem),
+        radial-gradient(circle at 50% 38%, rgba(57, 168, 255, 0.15), transparent 36rem),
+        linear-gradient(135deg, #05070d 0%, #071b25 52%, #070911 100%);
 }
 
 body.design-pimp .centered-hero {
